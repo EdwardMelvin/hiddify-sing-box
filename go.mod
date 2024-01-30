@@ -1,6 +1,8 @@
 module github.com/sagernet/sing-box
 
-go 1.20
+go 1.21
+
+toolchain go1.21.6
 
 require (
 	berty.tech/go-libtor v1.0.385
@@ -56,6 +58,14 @@ require (
 	howett.net/plist v1.0.1
 )
 
+require (
+	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/jpillora/backoff v1.0.0 // indirect
+	github.com/jpillora/sizestr v1.0.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
+)
+
 //replace github.com/sagernet/sing => ../sing
 
 require (
@@ -73,6 +83,7 @@ require (
 	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/josharian/native v1.1.0 // indirect
+	github.com/jpillora/chisel v1.9.1
 	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/libdns/libdns v0.2.1 // indirect

